@@ -10,11 +10,9 @@ O serviço FinalizaJogo procura jogos em andamento com pelo menos sete dias de i
 
 O fluxo tem duas fases:
 
-1.
-Finaliza e persiste todos os jogos elegíveis, incluindo o ID do vencedor.
+1. Finaliza e persiste todos os jogos elegíveis, incluindo o ID do vencedor.
 
-2.
-Somente depois que todas as gravações terminam com sucesso, envia o SMS a cada vencedor.
+2. Somente depois que todas as gravações terminam com sucesso, envia o SMS a cada vencedor.
 
 Se qualquer gravação falhar, o fluxo é interrompido e nenhum SMS é enviado. Jogos recentes permanecem em andamento. Um jogo antigo sem resultados não é persistido nem notificado, pois não é possível identificar um vencedor.
 
@@ -39,7 +37,7 @@ src/main/resources/db/migration/V1__adiciona_vencedor_id_em_jogo.sql: script par
 
 Os testes automatizados ficam em src/test/java.
 
-Regra de negócio
+# Regra de negócio
 
 Em br/com/valueprojects/mock_spring/FinalizaJogoTest.java:
 
@@ -58,11 +56,11 @@ InOrder comprova que todas as atualizações do DAO ocorrem antes dos envios de 
 •
 Os cenários cobrem jogos elegíveis e recentes, falha de gravação e jogo sem resultados.
 
-Persistência JDBC
+# Persistência JDBC
 
 Em infra/JogoDaoTest.java, Connection, PreparedStatement e ResultSet são mocks. DriverManager é mockado estaticamente para testar a criação da conexão sem acessar um banco real. Assim, os caminhos de consulta, gravação, chave gerada, atualização e erro SQL são testados sem uma conexão MySQL.
 
-Outras classes
+# Outras classes
 
 •
 MockSpringApplicationTest.java mocka estaticamente SpringApplication para testar o método main sem iniciar um servidor.
@@ -84,15 +82,11 @@ Na raiz do projeto, execute:
 
 Bash
 
-
 bash ./mvnw clean verify
-
-
 
 O comando executa a suíte, gera o relatório HTML e valida os limites de cobertura configurados. O relatório fica em:
 
-Plain Text
-
+# Plain Text
 
 target/site/jacoco/index.html
 
