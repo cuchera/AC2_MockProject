@@ -1,0 +1,10 @@
+br\com\valueprojects\mock_spring\test\JogoTest.class
+br\com\valueprojects\mock_spring\TesteUnidade2ApplicationTests.class
+infra\JogoDaoTest.class
+br\com\valueprojects\mock_spring\test\JulgamentoTest.class
+br\com\valueprojects\mock_spring\FinalizaJogoTest.class
+infra\JogoDaoFalsoTest.class
+br\com\valueprojects\mock_spring\controller\JogoControllerTest.class
+br\com\valueprojects\mock_spring\MockSpringApplicationTest.class
+br\com\valueprojects\mock_spring\test\UtilitariosTest.class
+br\com\valueprojects\mock_spring\test\ParticipanteTest.class

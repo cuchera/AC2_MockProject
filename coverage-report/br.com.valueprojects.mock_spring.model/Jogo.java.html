@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Jogo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">teste-unidade-2</a> &gt; <a href="index.source.html" class="el_package">br.com.valueprojects.mock_spring.model</a> &gt; <span class="el_source">Jogo.java</span></div><h1>Jogo.java</h1><pre class="source lang-java linenums">package br.com.valueprojects.mock_spring.model;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
+
+public class Jogo {
+
+    private String descricao;
+    private Calendar data;
+    private List&lt;Resultado&gt; resultados;
+    private boolean finaliza;
+    private int id;
+    private Participante vencedor;
+
+    public Jogo(String descricao) {
+<span class="fc" id="L18">        this(descricao, Calendar.getInstance());</span>
+<span class="fc" id="L19">    }</span>
+
+<span class="fc" id="L21">    public Jogo(String descricao, Calendar data) {</span>
+<span class="fc" id="L22">        this.descricao = descricao;</span>
+<span class="fc" id="L23">        this.data = data;</span>
+<span class="fc" id="L24">        this.resultados = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L25">    }</span>
+
+    public void anota(Resultado resultado) {
+<span class="fc bfc" id="L28" title="All 4 branches covered.">        if (resultados.isEmpty() || podeTerResultado(resultado.getParticipante())) {</span>
+<span class="fc" id="L29">            resultados.add(resultado);</span>
+        }
+<span class="fc" id="L31">    }</span>
+
+    private boolean podeTerResultado(Participante participante) {
+<span class="fc bfc" id="L34" title="All 2 branches covered.">        return !ultimoResultadoRecebido().getParticipante().equals(participante)</span>
+<span class="fc bfc" id="L35" title="All 2 branches covered.">                &amp;&amp; qtdDeResultadosDo(participante) &lt; 5;</span>
+    }
+
+    private int qtdDeResultadosDo(Participante participante) {
+<span class="fc" id="L39">        int total = 0;</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        for (Resultado resultado : resultados) {</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">            if (resultado.getParticipante().equals(participante)) {</span>
+<span class="fc" id="L42">                total++;</span>
+            }
+<span class="fc" id="L44">        }</span>
+<span class="fc" id="L45">        return total;</span>
+    }
+
+    private Resultado ultimoResultadoRecebido() {
+<span class="fc" id="L49">        return resultados.get(resultados.size() - 1);</span>
+    }
+
+    /**
+     * Define como vencedor o participante com a maior métrica. Em caso de empate,
+     * vence o participante cujo resultado aparece primeiro.
+     *
+     * @return participante vencedor
+     * @throws IllegalStateException se o jogo não possuir resultados
+     */
+    public Participante identificaVencedor() {
+<span class="fc bfc" id="L60" title="All 2 branches covered.">        if (resultados.isEmpty()) {</span>
+<span class="fc" id="L61">            throw new IllegalStateException(&quot;Não é possível identificar vencedor sem resultados.&quot;);</span>
+        }
+
+<span class="fc" id="L64">        Resultado melhorResultado = resultados.get(0);</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        for (Resultado resultado : resultados) {</span>
+<span class="fc bfc" id="L66" title="All 2 branches covered.">            if (resultado.getMetrica() &gt; melhorResultado.getMetrica()) {</span>
+<span class="fc" id="L67">                melhorResultado = resultado;</span>
+            }
+<span class="fc" id="L69">        }</span>
+<span class="fc" id="L70">        vencedor = melhorResultado.getParticipante();</span>
+<span class="fc" id="L71">        return vencedor;</span>
+    }
+
+    public String getDescricao() {
+<span class="fc" id="L75">        return descricao;</span>
+    }
+
+    public List&lt;Resultado&gt; getResultados() {
+<span class="fc" id="L79">        return Collections.unmodifiableList(resultados);</span>
+    }
+
+    public Calendar getData() {
+<span class="fc" id="L83">        return (Calendar) data.clone();</span>
+    }
+
+    public void finaliza() {
+<span class="fc" id="L87">        this.finaliza = true;</span>
+<span class="fc" id="L88">    }</span>
+
+    public boolean isFinalizado() {
+<span class="fc" id="L91">        return finaliza;</span>
+    }
+
+    public void setId(int id) {
+<span class="fc" id="L95">        this.id = id;</span>
+<span class="fc" id="L96">    }</span>
+
+    public int getId() {
+<span class="fc" id="L99">        return id;</span>
+    }
+
+    public void setData(Calendar data) {
+<span class="fc" id="L103">        this.data = data;</span>
+<span class="fc" id="L104">    }</span>
+
+    public Participante getVencedor() {
+<span class="fc" id="L107">        return vencedor;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

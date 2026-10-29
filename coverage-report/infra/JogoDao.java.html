@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JogoDao.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">teste-unidade-2</a> &gt; <a href="index.source.html" class="el_package">infra</a> &gt; <span class="el_source">JogoDao.java</span></div><h1>JogoDao.java</h1><pre class="source lang-java linenums">package infra;
+
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Objects;
+
+import br.com.valueprojects.mock_spring.model.Jogo;
+import br.com.valueprojects.mock_spring.model.Participante;
+import br.com.valueprojects.mock_spring.model.Resultado;
+
+public class JogoDao {
+
+    private final Connection conexao;
+
+<span class="fc" id="L23">    public JogoDao() {</span>
+        try {
+<span class="fc" id="L25">            this.conexao = DriverManager.getConnection(&quot;jdbc:mysql://localhost/mocks&quot;, &quot;root&quot;, &quot;&quot;);</span>
+<span class="fc" id="L26">        } catch (Exception e) {</span>
+<span class="fc" id="L27">            throw new RuntimeException(e);</span>
+<span class="fc" id="L28">        }</span>
+<span class="fc" id="L29">    }</span>
+
+    /** Construtor destinado a testes e a configuração externa da conexão. */
+<span class="fc" id="L32">    public JogoDao(Connection conexao) {</span>
+<span class="fc" id="L33">        this.conexao = Objects.requireNonNull(conexao, &quot;conexao não pode ser nula&quot;);</span>
+<span class="fc" id="L34">    }</span>
+
+    private Calendar data(Date date) {
+<span class="fc" id="L37">        Calendar calendario = Calendar.getInstance();</span>
+<span class="fc" id="L38">        calendario.setTime(date);</span>
+<span class="fc" id="L39">        return calendario;</span>
+    }
+
+    public void salva(Jogo jogo) {
+        try {
+<span class="fc" id="L44">            String sql = &quot;INSERT INTO JOGO (DESCRICAO, DATA, FINALIZADO) VALUES (?,?,?);&quot;;</span>
+<span class="fc" id="L45">            PreparedStatement ps = conexao.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);</span>
+<span class="fc" id="L46">            ps.setString(1, jogo.getDescricao());</span>
+<span class="fc" id="L47">            ps.setDate(2, new java.sql.Date(jogo.getData().getTimeInMillis()));</span>
+<span class="fc" id="L48">            ps.setBoolean(3, jogo.isFinalizado());</span>
+<span class="fc" id="L49">            ps.execute();</span>
+
+<span class="fc" id="L51">            ResultSet generatedKeys = ps.getGeneratedKeys();</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">            if (generatedKeys.next()) {</span>
+<span class="fc" id="L53">                jogo.setId(generatedKeys.getInt(1));</span>
+            }
+
+<span class="fc bfc" id="L56" title="All 2 branches covered.">            for (Resultado resultado : jogo.getResultados()) {</span>
+<span class="fc" id="L57">                sql = &quot;INSERT INTO RESULTADOS (JOGO_ID, PARTICIPANTE_ID, VALOR) VALUES (?,?,?);&quot;;</span>
+<span class="fc" id="L58">                PreparedStatement ps2 = conexao.prepareStatement(sql);</span>
+<span class="fc" id="L59">                ps2.setInt(1, jogo.getId());</span>
+<span class="fc" id="L60">                ps2.setInt(2, resultado.getParticipante().getId());</span>
+<span class="fc" id="L61">                ps2.setDouble(3, resultado.getMetrica());</span>
+<span class="fc" id="L62">                ps2.execute();</span>
+<span class="fc" id="L63">                ps2.close();</span>
+<span class="fc" id="L64">            }</span>
+<span class="fc" id="L65">            ps.close();</span>
+<span class="fc" id="L66">        } catch (SQLException e) {</span>
+<span class="fc" id="L67">            throw new RuntimeException(e);</span>
+<span class="fc" id="L68">        }</span>
+<span class="fc" id="L69">    }</span>
+
+    public List&lt;Jogo&gt; finalizados() {
+<span class="fc" id="L72">        return foiFinalizado(true);</span>
+    }
+
+    public List&lt;Jogo&gt; emAndamento() {
+<span class="fc" id="L76">        return foiFinalizado(false);</span>
+    }
+
+    private List&lt;Jogo&gt; foiFinalizado(boolean status) {
+        try {
+<span class="fc" id="L81">            String sql = &quot;SELECT * FROM JOGO WHERE FINALIZADO = &quot; + status + &quot;;&quot;;</span>
+<span class="fc" id="L82">            PreparedStatement ps = conexao.prepareStatement(sql);</span>
+<span class="fc" id="L83">            ResultSet rs = ps.executeQuery();</span>
+<span class="fc" id="L84">            List&lt;Jogo&gt; jogos = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L86" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L87">                Jogo jogo = new Jogo(rs.getString(&quot;descricao&quot;), data(rs.getDate(&quot;data&quot;)));</span>
+<span class="fc" id="L88">                jogo.setId(rs.getInt(&quot;id&quot;));</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">                if (rs.getBoolean(&quot;finalizado&quot;)) {</span>
+<span class="fc" id="L90">                    jogo.finaliza();</span>
+                }
+
+<span class="fc" id="L93">                String sqlResultados = &quot;SELECT VALOR, NOME, U.ID AS PARTICIPANTE_ID, L.ID AS RESULTADO_ID &quot;</span>
+                        + &quot;FROM RESULTADOS L INNER JOIN PARTICIPANTE U ON U.ID = L.PARTICIPANTE_ID WHERE JOGO_ID = &quot;
+<span class="fc" id="L95">                        + rs.getInt(&quot;id&quot;);</span>
+<span class="fc" id="L96">                PreparedStatement ps2 = conexao.prepareStatement(sqlResultados);</span>
+<span class="fc" id="L97">                ResultSet rs2 = ps2.executeQuery();</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">                while (rs2.next()) {</span>
+<span class="fc" id="L99">                    Participante participante = new Participante(rs2.getInt(&quot;participante_id&quot;), rs2.getString(&quot;nome&quot;));</span>
+<span class="fc" id="L100">                    Resultado resultado = new Resultado(participante, rs2.getDouble(&quot;metrica&quot;));</span>
+<span class="fc" id="L101">                    jogo.anota(resultado);</span>
+<span class="fc" id="L102">                }</span>
+<span class="fc" id="L103">                rs2.close();</span>
+<span class="fc" id="L104">                ps2.close();</span>
+<span class="fc" id="L105">                jogos.add(jogo);</span>
+<span class="fc" id="L106">            }</span>
+<span class="fc" id="L107">            rs.close();</span>
+<span class="fc" id="L108">            ps.close();</span>
+<span class="fc" id="L109">            return jogos;</span>
+<span class="fc" id="L110">        } catch (SQLException e) {</span>
+<span class="fc" id="L111">            throw new RuntimeException(e);</span>
+        }
+    }
+
+    public void atualiza(Jogo jogo) {
+        try {
+<span class="fc" id="L117">            String sql = &quot;UPDATE JOGO SET DESCRICAO=?, DATA=?, FINALIZADO=?, VENCEDOR_ID=? WHERE ID = ?;&quot;;</span>
+<span class="fc" id="L118">            PreparedStatement ps = conexao.prepareStatement(sql);</span>
+<span class="fc" id="L119">            ps.setString(1, jogo.getDescricao());</span>
+<span class="fc" id="L120">            ps.setDate(2, new java.sql.Date(jogo.getData().getTimeInMillis()));</span>
+<span class="fc" id="L121">            ps.setBoolean(3, jogo.isFinalizado());</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">            if (jogo.getVencedor() == null) {</span>
+<span class="fc" id="L123">                ps.setNull(4, java.sql.Types.INTEGER);</span>
+            } else {
+<span class="fc" id="L125">                ps.setInt(4, jogo.getVencedor().getId());</span>
+            }
+<span class="fc" id="L127">            ps.setInt(5, jogo.getId());</span>
+<span class="fc" id="L128">            ps.execute();</span>
+<span class="fc" id="L129">        } catch (SQLException e) {</span>
+<span class="fc" id="L130">            throw new RuntimeException(e);</span>
+<span class="fc" id="L131">        }</span>
+<span class="fc" id="L132">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

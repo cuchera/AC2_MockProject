@@ -1,0 +1,12 @@
+br\com\valueprojects\mock_spring\model\Participante.class
+br\com\valueprojects\mock_spring\model\Juiz.class
+infra\JogoDaoFalso.class
+infra\JogoDao.class
+br\com\valueprojects\mock_spring\model\FinalizaJogo.class
+br\com\valueprojects\mock_spring\model\Pagamento.class
+br\com\valueprojects\mock_spring\controller\JogoController.class
+br\com\valueprojects\mock_spring\Mock_SpringApplication.class
+br\com\valueprojects\mock_spring\model\Jogo.class
+br\com\valueprojects\mock_spring\service\SmsNotificador.class
+br\com\valueprojects\mock_spring\builder\CriadorDeJogo.class
+br\com\valueprojects\mock_spring\model\Resultado.class
